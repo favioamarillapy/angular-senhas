@@ -1,0 +1,173 @@
+<!-- breadcrumb -->
+<div class="container-fluid pl-5 pr-5 pt-5">
+  <div class="row">
+    <div class="col">
+      <span class="float-left d-flex">
+        <h1>Usuarios</h1>
+        <div class="spinner-border text-dark ml-4" role="status" *ngIf="cargando">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </span>
+      <span class="float-right">
+        <button class="btn btn-primary btn-lg" (click)="mostrarFormulario(true, true)" *ngIf="!form"> Agregar</button>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- mensaje de operaciones -->
+<div class="container-fluid pl-5">
+  <div class="col-md-6" *ngIf="mensaje != ''">
+    <div class="alert" role="alert" [ngClass]="{'alert-success': mensajeSuccess,'alert-danger': !mensajeSuccess }">
+      {{ mensaje }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- seccion listado -->
+<div class="container-fluid p-5" *ngIf="!form">
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Nombre Completo</th>
+          <th scope="col">Email</th>
+          <th scope="col">Rol</th>
+          <th scope="col" class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <mat-form-field>
+              <mat-label>Nombre Completo</mat-label>
+              <input matInput name="nombre_completo" [(ngModel)]="filtrosTabla.nombre_completo"
+                (keyup.enter)="filtrarTabla($event)">
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field>
+              <mat-label>Email</mat-label>
+              <input matInput name="email" [(ngModel)]="filtrosTabla.email" (keyup.enter)="filtrarTabla($event)">
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field>
+              <mat-label>Rol</mat-label>
+              <mat-select name="rol" [(ngModel)]="filtrosTabla.rol" (change)="filtrarTabla($event)">
+                <mat-option value="AD">ADMINISTRADOR</mat-option>
+                <mat-option value="US">USUARIO</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </td>
+          <td style="vertical-align: middle;" class="text-center">
+            <button class="btn btn-sm btn-danger" (click)="filtrarTabla(null)"><i class="fas fa-times"></i></button>
+          </td>
+        </tr>
+        <tr
+          *ngFor="let fila of listado | paginate: { itemsPerPage: porPagina, currentPage: paginaActual, totalItems: total }">
+          <td>{{ fila.nombre_completo }}</td>
+          <td>{{ fila.email }}</td>
+          <td>
+            <div *ngIf="fila.rol == 'AD'">ADMINISTRADOR</div>
+            <div *ngIf="fila.rol == 'US'">USUARIO</div>
+          </td>
+          <td class="text-center">
+            <button type="button" class="btn btn-warning btn-sm" (click)="getModelo(fila.id)"> <i
+                class="fas fa-edit"></i>
+            </button>
+            &nbsp;
+            <button type="button" class="btn btn-sm" data-toggle="modal" data-target="#modalEstado"
+              (click)="setEstadoUsuario(fila.id)"
+              [ngClass]="{'btn-danger': fila.activo == 'S', 'btn-success': fila.activo == 'N'}">
+              <i class="fas" [ngClass]="{'fa-times': fila.activo == 'S', 'fa-check-square': fila.activo == 'N'}"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- paginacion -->
+  <div *ngIf="!form" class="row justify-content-center">
+    <app-paginacion (actualizarPagina)="paginacion($event)"></app-paginacion>
+  </div>
+
+  <div class="modal fade" id="modalEstado" tabindex="-1" role="dialog" aria-labelledby="modalEstado" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalEstado">Cambio de Estado</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          ¿Deseas cambiar el estado del usuario?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal"
+            (click)="activarDesactivarUsuario()">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+
+<!-- seccion formulario -->
+<div class="container-fluid p-5" *ngIf="form">
+  <form *ngIf="form" class="form-group">
+
+    <div class="row">
+      <div class="form-group col-md-6">
+        <mat-form-field class="example-full-width">
+          <input matInput placeholder="Nombre Completo" name="nombre_completo" [(ngModel)]="modelo.nombre_completo">
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="form-group col-md-6">
+        <mat-form-field class="example-full-width">
+          <input matInput placeholder="Email" name="email" [(ngModel)]="modelo.email">
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="form-group col-md-6">
+        <mat-form-field>
+          <mat-label>Rol</mat-label>
+          <mat-select name="rol" [(ngModel)]="modelo.rol">
+            <mat-option value="AD">ADMINISTRADOR</mat-option>
+            <mat-option value="US">USUARIO</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <br>
+
+    <div class="row justify-content-end">
+      <button type="button" class="btn btn-danger" (click)="mostrarFormulario(false, false)">
+        Cancelar
+      </button> &nbsp;
+      <button type="submit" class="btn btn-success">
+        <div *ngIf="nuevo" (click)="registrar()">
+          Guardar
+        </div>
+        <div *ngIf="!nuevo" (click)="actualizar()">
+          Actualizar
+        </div>
+      </button> &nbsp;
+    </div>
+
+  </form>
+</div>

@@ -1,0 +1,49 @@
+/* .seccion-juego h5 {
+    overflow: hidden;
+    text-align: center;
+}
+
+.seccion-juego h5:before, .seccion-juego h5:after {
+    background-color: #dee2e6;
+    content: "";
+    display: inline-block;
+    height: 1px;
+    position: relative;
+    vertical-align: middle;
+    width: 50%;
+}
+
+.seccion-juego h5:before {
+    right: 0.5em;
+    margin-left: -50%;
+}
+
+.seccion-juego h5:after {
+    left: 0.5em;
+    margin-right: -50%;
+}
+
+.seccion-opciones h5 {
+    overflow: hidden;
+    text-align: center;
+}
+
+.seccion-opciones h5:before, .seccion-opciones h5:after {
+    background-color: #dee2e6;
+    content: "";
+    display: inline-block;
+    height: 1px;
+    position: relative;
+    vertical-align: middle;
+    width: 50%;
+}
+
+.seccion-opciones h5:before {
+    right: 0.5em;
+    margin-left: -50%;
+}
+
+.seccion-opciones h5:after {
+    left: 0.5em;
+    margin-right: -50%;
+} */

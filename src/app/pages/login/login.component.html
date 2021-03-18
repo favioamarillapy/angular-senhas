@@ -1,0 +1,47 @@
+<div class="wrapper">
+  <div class="main-panel">
+
+    <div class="content">
+      <div class="overlay">
+        <div class="form align-center">
+          <div class="thumbnail"><img src="assets/images/login-avatar.png" width="100" height="100" /></div>
+
+          <form [formGroup]="frmLogin" class="form-signin text-center" novalidate>
+
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Email" name="email" formControlName="email" autocomplete="off">
+              </mat-form-field>
+              <p class="invalid-feedback d-block" *ngIf="frmLogin.get('email').hasError('required') && goFrmLogin">Este
+                campo es
+                obligatorio</p>
+            </div>
+
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <input type="password" matInput placeholder="Clave de acceso" name="password" formControlName="password"
+                  autocomplete="off">
+              </mat-form-field>
+              <p class="invalid-feedback d-block" *ngIf="frmLogin.get('password').hasError('required') && goFrmLogin">
+                Este campo
+                es obligatorio</p>
+            </div>
+
+            <button type="button" class="btn btn-primary" (click)="login()">
+              <span *ngIf="cargando" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              Acceder
+            </button>
+            <br>
+
+            <div class="alert alert-danger" role="alert" *ngIf="!acceso">
+              Acceso Denegado
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

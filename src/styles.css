@@ -1,0 +1,40 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+mat-form-field {
+    width: 100%;
+}
+
+:root {
+    --primary: #00a1e1;
+    --hover: #0680b1;
+}
+
+.menu {
+    background-color: var(--primary) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--hover) !important;
+    border-color: var(--hover) !important;
+}
+
+.text-primary {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+}
+
+/* estilos para botones de paginacion */
+.ngx-pagination .current {
+    background-color: var(--primary) !important;
+}
+.ngx-pagination .current:hover {
+    cursor: pointer;
+    background-color: var(--hover) !important;
+    border-color: var(--hover) !important;
+}

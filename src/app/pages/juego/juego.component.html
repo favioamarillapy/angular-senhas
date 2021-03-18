@@ -1,0 +1,267 @@
+<!-- breadcrumb -->
+<div class="container-fluid pl-5 pr-5 pt-5">
+  <div class="row">
+    <div class="col">
+      <span class="float-left d-flex">
+        <h1>Juegos</h1>
+        <div class="spinner-border text-dark ml-4" role="status" *ngIf="cargando">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </span>
+      <span class="float-right">
+        <button class="btn btn-primary btn-lg" (click)="mostrarFormulario(true, true)" *ngIf="!form"> Agregar</button>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- mensaje de operaciones -->
+<div class="container-fluid pl-5">
+  <div class="col-md-6" *ngIf="mensaje != ''">
+    <div class="alert" role="alert" [ngClass]="{'alert-success': mensajeSuccess,'alert-danger': !mensajeSuccess }">
+      {{ mensaje }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- seccion listado -->
+<div class="container-fluid p-5" *ngIf="!form">
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Nivel - Sub Nivel</th>
+          <th scope="col">Nombre</th>
+          <th scope="col" class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <mat-form-field class="example-full-width">
+              <mat-label>Sub Nivel</mat-label>
+              <input type="text" matInput [formControl]="listSubNivelControl" [matAutocomplete]="auto"
+                [(ngModel)]="filtrosTabla.sub_niveles_id">
+              <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFnSubNivel"
+                (optionSelected)='optionsSubNivelSelected($event.option.value)'>
+                <mat-option *ngFor="let option of filteredSubNivelOptions | async" [value]="option">
+                  {{option.nivel.descripcion}} - {{option.descripcion}}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field>
+              <mat-label>Nombre</mat-label>
+              <input matInput name="nombre" [(ngModel)]="filtrosTabla.nombre" (keyup.enter)="filtrarTabla($event)">
+            </mat-form-field>
+          </td>
+          <td style="vertical-align: middle;" class="text-center">
+            <button class="btn btn-sm btn-danger" (click)="filtrarTabla(null)"><i class="fas fa-times"></i></button>
+          </td>
+        </tr>
+        <tr
+          *ngFor="let fila of listado | paginate: { itemsPerPage: porPagina, currentPage: paginaActual, totalItems: total }">
+          <td>{{fila.sub_nivel.nivel.descripcion}} - {{ fila.sub_nivel.descripcion }}</td>
+          <td>{{ fila.nombre }}</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-warning btn-sm" (click)="getModelo(fila.id,fila.niveles_id)"> <i
+                class="fas fa-edit"></i>
+            </button>
+            &nbsp;
+            <button type="button" class="btn btn-sm" data-toggle="modal" data-target="#modalEstado"
+              (click)="setEstadoSubNivel(fila.id)"
+              [ngClass]="{'btn-danger': fila.activo == 'S', 'btn-success': fila.activo == 'N'}">
+              <i class="fas" [ngClass]="{'fa-times': fila.activo == 'S', 'fa-check-square': fila.activo == 'N'}"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- paginacion -->
+  <div *ngIf="!form" class="row justify-content-center">
+    <app-paginacion (actualizarPagina)="paginacion($event, true)"></app-paginacion>
+  </div>
+
+  <div class="modal fade" id="modalEstado" tabindex="-1" role="dialog" aria-labelledby="modalEstado" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalEstado">Cambio de Estado</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          ¿Deseas cambiar el estado del Sub Nivel?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal"
+            (click)="activarDesactivarJuego()">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+
+<!-- seccion formulario -->
+<div class="container-fluid p-5" *ngIf="form">
+  <form *ngIf="form" class="form-group">
+
+    <div class="row seccion-juego">
+      <div class="col-md-12 mb-3">
+        <h5>Detalles del Juego</h5>
+      </div>
+      <div class="col-md-6">
+        <div class="row">
+          <div class="ml-4 form-group col-md-12">
+            <mat-form-field class="example-full-width">
+              <mat-label>Sub Nivel</mat-label>
+              <input type="text" matInput [formControl]="formSubNivelControl" [matAutocomplete]="auto1">
+              <mat-autocomplete #auto1="matAutocomplete" [displayWith]="displayFnSubNivel"
+                (optionSelected)='optionsSubNivelSelected($event.option.value, true)'>
+                <mat-option *ngFor="let option of filteredSubNivelOptionsForm | async" [value]="option">
+                  {{option.nivel.descripcion}} - {{option.descripcion}}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+          <div class="ml-4 form-group col-md-12">
+            <mat-form-field class="example-full-width">
+              <input matInput placeholder="Nombre" name="nombre" [(ngModel)]="modelo.nombre">
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="row">
+          <div class="ml-4 form-group col-md-12 text-center">
+            <img [src]="modelo.imagen | urlImgSanitizer:'juego'" width="150" height="150" class="mb-1">
+            <angular-file-uploader [config]="fileUploaderConfig" [resetUpload]=resetVar (ApiResponse)="upload($event)">
+            </angular-file-uploader>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row seccion-opciones mt-5">
+      <div class="col-md-12">
+        <h5>Opciones del Juego</h5>
+      </div>
+
+      <div class="col -md-6">
+        <div class="ml-4 form-group col-md-10">
+          <mat-form-field class="example-full-width">
+            <input matInput placeholder="Descripcion" name="descripcion" [(ngModel)]="juegoOpcion.descripcion">
+          </mat-form-field>
+        </div>
+        <div class="ml-4 form-group col-md-10">
+          <mat-form-field class="example-full-width">
+            <mat-label>Correcto</mat-label>
+            <input type="text" matInput [formControl]="formCorrectoControl" [matAutocomplete]="auto2">
+            <mat-autocomplete #auto2="matAutocomplete" [displayWith]="displayFnCorrecto"
+              (optionSelected)='optionsCorrectoSelected($event.option.value)'>
+              <mat-option *ngFor="let option of filteredCorrectoOptions | async" [value]="option">
+                {{option.descripcion}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+        <div class="ml-4 form-group col-md-10">
+          <button type="button" class="btn btn-success" (click)="agregarOpcion()" *ngIf="!actualizarOpcion">
+            Agregar
+          </button>
+          <button type="button" class="btn btn-success" (click)="actualizarDataOpcion()" *ngIf="actualizarOpcion">
+            Actualizar
+          </button>
+          <button type="button" class="btn btn-danger" (click)="cancelarOpcion()" *ngIf="actualizarOpcion">
+            Cancelar
+          </button>
+        </div>
+      </div>
+
+      <div class="ml-4 col-md-6">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Descripcion</th>
+              <th>Correcto</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let opcion of modelo.opciones; let i = index">
+              <td>{{opcion.descripcion}}</td>
+              <td>
+                <div *ngIf="opcion.correcto == 'S'">SI</div>
+                <div *ngIf="opcion.correcto == 'N'">NO</div>
+              </td>
+              <td>
+                <button type="button" class="btn btn-warning btn-sm" (click)="getOpcion(i)">
+                  <i class="fas fa-edit"></i>
+                </button> &nbsp;
+                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
+                  data-target="#modaleliminarOpcion" (click)="seEliminarOpcion(opcion)">
+                  <i class="fas fa-times"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <br>
+
+    <div class="row justify-content-end mt-3">
+      <button type="button" class="btn btn-danger" (click)="mostrarFormulario(false, false)">
+        Cancelar
+      </button> &nbsp;
+      <button type="submit" class="btn btn-success">
+        <div *ngIf="nuevo" (click)="registrar()">
+          Guardar
+        </div>
+        <div *ngIf="!nuevo" (click)="actualizar()">
+          Actualizar
+        </div>
+      </button>
+    </div>
+
+  </form>
+
+
+
+  <div class="modal fade" id="modaleliminarOpcion" tabindex="-1" role="dialog"
+    aria-labelledby="modaleliminarOpcionLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modaleliminarOpcionLabel">Eliminar Opcion</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>¿Deseas eliminar la opcion?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal" (click)="eliminarOpcion()">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+</div>
+
